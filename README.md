@@ -15,7 +15,10 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 ## Идеи для api
 
 ```typescript
-  const initialState = {
+import {createState} from "./create-state";
+import {InjectionToken} from "@angular/core";
+
+const initialState = {
   accordeon: {title: "test", open: false},
   cart: {
     price: 10,
@@ -28,41 +31,42 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 class Component {
   private readonly state = createState(initialState)
 
-  private readonly accordeonTitle$ =
-    this.state.select(state => state.accordeon.title)
-// or
+  private readonly accordeonTitle$ = this.state.select(
+    state => state.accordeon.title
+  )
+  // or
   private readonly accordeonTitle$ =
     this.state.select([
       state => state.accordeon.title,
       state => state.cart.price,
     ])
-// or
-  private readonly accordeonTitle$ =
-    this.state.select('accordeon.title')
-// or
-  private readonly accordeonTitle$ =
-    this.state.select(['accordeon.title', 'cart.price'])
-// or
-// or
-  private readonly accordeonTitle$ =
-    this.state.select([
-      state => state.accordeon.title,
-      'cart.price'
-    ])
+  // or
+  private readonly accordeonTitle$ = this.state.select('accordeon.title')
+  // or
+  private readonly accordeonTitle$ = this.state.select([
+    'accordeon.title',
+    'cart.price'
+  ])
+  // or
+  private readonly accordeonTitle$ = this.state.select([
+    state => state.accordeon.title,
+    'cart.price'
+  ])
 
-  private readonly cartPrice$ = state.select("cart.price")
+  private readonly cartPrice$ = rhis.state.select("cart.price")
     .pipe(
       withLatestFrom(
-        state.select("cart.currency")
+        this.state.select("cart.currency")
       ),
       map(([price, currency]) =>
         price + " " + currency
       )
     )
-// or
-  private readonly cartPrice$ = state.select(
-    ["cart.price", "cart.currency"]
-  ).pipe(
+  // or
+  private readonly cartPrice$ = this.state.select([
+    "cart.price",
+    "cart.currency"
+  ]).pipe(
     map(([price, currency]) =>
       price + " " + currency
     )
@@ -107,25 +111,25 @@ class Component {
 
     this.state.clear() // сбрасывает до initialState
 
-    //
+    // можно передать коллбек который будет вызываться при изменении любого из полей, если не передать deps то будет вызываться при изменении любого поля
     this.state.onChange(
       () => console.log('deps changed'),
       ['accordeon.open', 'cart.price']
-    ) // - можно передать коллбек который будет вызываться при изменении любого из полей, если не передать deps то будет вызываться при изменении любого поля
-
-
+    )
   }
 
   // подписываться ни на что не нужно, просто вызываешь метод, либа сама под капотом подпишется и отпишется в onDestroy
-  private getUser(id: string){
-    state.effect(
+  private getUser(id: string) {
+    this.state.effect(
       () => this.userService.getUser(id)
         .pipe(
-          (user: User) => state.update({user})
+          (user: User) => this.state.update({user})
         )
     )
   }
 }
+
+const state = createState(initialState);
 
 const facade = createStoreFacade(
   {
@@ -145,5 +149,7 @@ const facade = createStoreFacade(
     )
   }
 )
+
+const FACADE = new InjectionToken('facade', { factory: () => facade })
 ```
 
