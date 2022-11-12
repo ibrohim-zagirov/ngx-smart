@@ -10,7 +10,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 Управление стейтом компонента (пока только для компонентов)
 
 ## В чем преимущества?
-Очень просто и удобный api
+Очень простой и удобный api
 
 ## Идеи для api
 
@@ -131,24 +131,26 @@ class Component {
 
 const state = createState(initialState);
 
-const facade = createStoreFacade(
-  {
-    cartPrice$: state.select(
-      ["cart.price", "cart.currency"]
-    ).pipe(
-      map(([price, currency]) =>
-        price + " " + currency
-      )
-    ),
-    getUser: (id) => effect(
-      () => this.userService.getUser(id)
-        .pipe(
-          (user: User) =>
-            state.update({user})
-        )
-    )
-  }
+const cartPrice$ = state.select(
+  ["cart.price", "cart.currency"]
+).pipe(
+  map(([price, currency]) =>
+    price + " " + currency
+  )
 )
+
+const getUser = (id) => state.effect(
+  () => this.userService.getUser(id)
+    .pipe(
+      (user: User) =>
+        state.update({user})
+    )
+)
+
+const facade = {
+  cartPrice$,
+  getUser,
+}
 
 const FACADE = new InjectionToken('facade', { factory: () => facade })
 ```
