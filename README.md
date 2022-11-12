@@ -6,22 +6,144 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Code scaffolding
+Какие проблемы будет решать?
+Управление стейтом компонента (пока только для компонентов)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+В чем преимущества?
+Очень просто и удобный api
 
-## Build
+Идеи для api
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```typescript
+  const initialState = {
+  accordeon: {title: "test", open: false},
+  cart: {
+    price: 10,
+    currency: "$",
+    count: 2,
+    selectedIds: ["1", "2", "3"]
+  }
+}
 
-## Running unit tests
+class Component {
+  private readonly state = createState(initialState)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+  private readonly accordeonTitle$ =
+    this.state.select(state => state.accordeon.title)
+// or
+  private readonly accordeonTitle$ =
+    this.state.select([
+      state => state.accordeon.title,
+      state => state.cart.price,
+    ])
+// or
+  private readonly accordeonTitle$ =
+    this.state.select('accordeon.title')
+// or
+  private readonly accordeonTitle$ =
+    this.state.select(['accordeon.title', 'cart.price'])
+// or
+// or
+  private readonly accordeonTitle$ =
+    this.state.select([
+      state => state.accordeon.title,
+      'cart.price'
+    ])
 
-## Running end-to-end tests
+  private readonly cartPrice$ = state.select("cart.price")
+    .pipe(
+      withLatestFrom(
+        state.select("cart.currency")
+      ),
+      map(([price, currency]) =>
+        price + " " + currency
+      )
+    )
+// or
+  private readonly cartPrice$ = state.select(
+    ["cart.price", "cart.currency"]
+  ).pipe(
+    map(([price, currency]) =>
+      price + " " + currency
+    )
+  )
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+  constructor() {
+    this.state.update({accordeon: {title: "test2"}})
+    // or
+    this.state.update("accordeon.title", "test2")
+    // or
+    this.state.update(
+      ["accordeon.title", "test2"],
+      ["cart.price", 25],
+      ["cart.count", 5]
+    )
+    // or
+    this.state.update(
+      ["accordeon.title", "test2"],
+      [
+        "cart.selectedIds",
+        ids => ids.filter(id => id !== "3")
+      ],
+    )
+    //or
+    this.state.update(
+      state => ({
+        ...state,
+        cart: {
+          ...state.cart,
+          count: 5
+        }
+      })
+    )
+    // or*
+    this.state.update(state => state.cart = "5")
 
-## Further help
+    this.state.update({isAdmin: true})
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+    this.state.remove("isAdmin")
+    // or
+    this.state.remove(["isAdmin", "accordeon.open"])
+
+    this.state.clear() // сбрасывает до initialState
+
+    //
+    this.state.onChange(
+      () => console.log('deps changed'),
+      ['accordeon.open', 'cart.price']
+    ) // - можно передать коллбек который будет вызываться при изменении любого из полей, если не передать deps то будет вызываться при изменении любого поля
+
+
+  }
+
+  // подписываться ни на что не нужно, просто вызываешь метод, либа сама под капотом подпишется и отпишется в onDestroy
+  private getUser(id: string){
+    state.effect(
+      () => this.userService.getUser(id)
+        .pipe(
+          (user: User) => state.update({user})
+        )
+    )
+  }
+}
+
+const facade = createStoreFacade(
+  {
+    cartPrice$: state.select(
+      ["cart.price", "cart.currency"]
+    ).pipe(
+      map(([price, currency]) =>
+        price + " " + currency
+      )
+    ),
+    getUser: (id) => effect(
+      () => this.userService.getUser(id)
+        .pipe(
+          (user: User) =>
+            state.update({user})
+        )
+    )
+  }
+)
+```
+
