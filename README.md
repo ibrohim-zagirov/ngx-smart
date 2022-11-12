@@ -6,13 +6,13 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-Какие проблемы будет решать?
+## Какие проблемы будет решать?
 Управление стейтом компонента (пока только для компонентов)
 
-В чем преимущества?
+## В чем преимущества?
 Очень просто и удобный api
 
-Идеи для api
+## Идеи для api
 
 ```typescript
   const initialState = {
