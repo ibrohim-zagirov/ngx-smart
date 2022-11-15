@@ -1,4 +1,4 @@
-import {BehaviorSubject, EMPTY, map, Observable} from "rxjs";
+import {BehaviorSubject, combineLatest, EMPTY, map, Observable} from "rxjs";
 import {select} from './utils'
 
 type Path = string;
@@ -13,14 +13,13 @@ export class State<T extends object> {
   }
 
   public select(select: SelectArg<T>): Observable<any> {
-    // if (Array.isArray(select)) {
-    //   return this.state$.pipe(
-    //     map(
-    //       state => this.selectBy(state)
-    //     )
-    //   )
-    // }
-
+    if (Array.isArray(select)) {
+      return combineLatest(
+        select.map(
+          selectEl => this.selectBy(selectEl)
+        )
+      )
+    }
     return this.selectBy(select);
   }
 
