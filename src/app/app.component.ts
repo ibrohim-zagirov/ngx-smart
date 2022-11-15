@@ -27,6 +27,19 @@ export class AppComponent {
     this.city$.subscribe(console.log)
     this.cityByFn$.subscribe(console.log)
     this.multi$.subscribe(console.log)
+    this.state.update(
+      state => ({
+        ...state,
+        user: {
+          ...state.user,
+          address: {
+            ...state.user.address,
+            city: 'Moscow'
+          }
+        }
+      })
+    )
+    this.state.update({user: {address: {city: "London"}}})
   }
 
 }

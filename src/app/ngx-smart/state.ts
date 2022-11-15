@@ -2,8 +2,10 @@ import {BehaviorSubject, combineLatest, EMPTY, map, Observable} from "rxjs";
 import {select} from './utils'
 
 type Path = string;
-type SelectFn<T> = (state: T) => any
-export type SelectArg<T> = Path | Path[] | SelectFn<T> | SelectFn<T>[] | Array<Path | SelectFn<T>>;
+type StateCallback<T> = (state: T) => any
+export type Selector<T> = Path | Path[] | StateCallback<T> | StateCallback<T>[] | Array<Path | StateCallback<T>>;
+
+export type UpdaterData<T> = Path | [Path, any] | [Path, StateCallback<T>] | Selector<T> | object
 
 export class State<T extends object> {
   private readonly state$: BehaviorSubject<T>;
@@ -12,18 +14,33 @@ export class State<T extends object> {
     this.state$ = new BehaviorSubject(initialState);
   }
 
-  public select(select: SelectArg<T>): Observable<any> {
-    if (Array.isArray(select)) {
+  public select(selector: Selector<T>): Observable<any> {
+    if (Array.isArray(selector)) {
       return combineLatest(
-        select.map(
+        selector.map(
           selectEl => this.selectBy(selectEl)
         )
       )
     }
-    return this.selectBy(select);
+    return this.selectBy(selector);
   }
 
-  private selectBy(select: SelectArg<T>) {
+  public update(data: UpdaterData<T>): void {
+    if (typeof data === 'function') {
+      return this.state$.next(
+        data(this.state$.value)
+      )
+    }
+
+    if (typeof data === 'object') {
+      return this.state$.next({
+        ...this.state$.value,
+        ...data
+      })
+    }
+  }
+
+  private selectBy(select: Selector<T>) {
     if (typeof select === 'string') {
       return this.selectByPath(select)
     }
@@ -42,7 +59,7 @@ export class State<T extends object> {
       )
   }
 
-  private selectByFn(fn: SelectFn<T>) {
+  private selectByFn(fn: StateCallback<T>) {
     return this.state$
       .pipe(
         map(fn)
