@@ -1,5 +1,5 @@
 import {BehaviorSubject, combineLatest, EMPTY, map, Observable} from "rxjs";
-import {select} from './utils'
+import {getValueToUpsert, select} from './utils'
 
 type Path = string;
 type StateCallback<T> = (state: T) => any
@@ -14,7 +14,10 @@ export class State<T extends object> {
     this.state$ = new BehaviorSubject(initialState);
   }
 
-  public select(selector: Selector<T>): Observable<any> {
+  public select(selector?: Selector<T>): Observable<any> {
+    if (!selector) {
+      return this.state$.asObservable()
+    }
     if (Array.isArray(selector)) {
       return combineLatest(
         selector.map(
@@ -32,11 +35,17 @@ export class State<T extends object> {
       )
     }
 
-    if (typeof data === 'object') {
-      return this.state$.next({
+    if (typeof data === "object" && !Array.isArray(data) && data !== null) {
+      this.state$.next({
         ...this.state$.value,
         ...data
       })
+    }
+
+    if (Array.isArray(data)) {
+      if (typeof data[0] === 'string' && data[1]) {
+        this.update(getValueToUpsert(data as [string, any]))
+      }
     }
   }
 

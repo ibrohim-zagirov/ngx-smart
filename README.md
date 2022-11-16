@@ -75,8 +75,6 @@ class Component {
   constructor() {
     this.state.update({accordeon: {title: "test2"}})
     // or
-    this.state.update("accordeon.title", "test2")
-    // or
     this.state.update(
       ["accordeon.title", "test2"],
       ["cart.price", 25],
