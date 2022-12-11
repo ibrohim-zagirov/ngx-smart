@@ -103,6 +103,18 @@ class Component {
 
     this.state.update({isAdmin: true})
 
+    // так же можно работать как с обычным Subject
+     this.state$.next(({
+      ...this.state$.value,
+      user: {
+        ...this.state$.value.user,
+        address: {
+          ...this.state$.value.user.address,
+          city: 'Moscow',
+        },
+      },
+    }));
+
     this.state.remove("isAdmin")
     // or
     this.state.remove(["isAdmin", "accordeon.open"])

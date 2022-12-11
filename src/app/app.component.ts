@@ -32,12 +32,12 @@ export class AppComponent {
     this.cityByFn$.subscribe(console.log);
     this.multi$.subscribe((multi) => console.log({ multi }));
     this.state$.select().subscribe(console.log);
-    this.state$.update((state) => ({
-      ...state,
+    this.state$.next(({
+      ...this.state$.value,
       user: {
-        ...state.user,
+        ...this.state$.value.user,
         address: {
-          ...state.user.address,
+          ...this.state$.value.user.address,
           city: 'Moscow',
         },
       },
