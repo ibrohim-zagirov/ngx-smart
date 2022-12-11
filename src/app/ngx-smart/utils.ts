@@ -1,5 +1,4 @@
-
-export const select = <T>(data: T, path: string | string[]) =>
+export const select = <T>(data: T, path: string | string[]): any =>
   Array.isArray(path)
     ? path
     : path.split('.').
