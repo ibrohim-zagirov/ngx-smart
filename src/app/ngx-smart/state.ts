@@ -1,9 +1,11 @@
-import {BehaviorSubject, EMPTY, map, Observable} from "rxjs";
-import {select} from './utils'
+import {BehaviorSubject, combineLatest, EMPTY, map, Observable} from "rxjs";
+import {getValueToUpsert, select} from './utils'
 
 type Path = string;
-type SelectFn<T> = (state: T) => any
-export type SelectArg<T> = Path | Path[] | SelectFn<T> | SelectFn<T>[] | Array<Path | SelectFn<T>>;
+type StateCallback<T> = (state: T) => any
+export type Selector<T> = Path | Path[] | StateCallback<T> | StateCallback<T>[] | Array<Path | StateCallback<T>>;
+
+export type UpdaterData<T> = Path | [Path, any] | [Path, StateCallback<T>] | Selector<T> | object
 
 export class State<T extends object> extends BehaviorSubject<T> {
 
