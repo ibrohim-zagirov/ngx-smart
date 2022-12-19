@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { createState } from './ngx-smart';
 
 @Component({
@@ -26,7 +26,8 @@ export class AppComponent {
   title = 'ngx-smart';
 
   constructor() {
-    this.state$.subscribe((initialState) => console.log(initialState))
+    this.state$.subscribe(console.log)
+    this.state$.clear()
     // console.log(this.state$.value);
     // this.state$.subscribe((res) => console.log({ res }));
     // this.city$.subscribe(console.log);
@@ -44,6 +45,7 @@ export class AppComponent {
       },
     }));
     this.state$.update({ user: { address: { city: 'London' } } });
-    this.state$.update(['user.address.city', 'Cairo']);
+    this.state$.update(['user.address.city', 'Cairo'])
+
   }
 }
