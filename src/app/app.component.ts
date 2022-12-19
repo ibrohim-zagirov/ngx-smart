@@ -26,12 +26,13 @@ export class AppComponent {
   title = 'ngx-smart';
 
   constructor() {
-    console.log(this.state$.value);
-    this.state$.subscribe((res) => console.log({ res }));
-    this.city$.subscribe(console.log);
-    this.cityByFn$.subscribe(console.log);
-    this.multi$.subscribe((multi) => console.log({ multi }));
-    this.state$.select().subscribe(console.log);
+    this.state$.subscribe((initialState) => console.log(initialState))
+    // console.log(this.state$.value);
+    // this.state$.subscribe((res) => console.log({ res }));
+    // this.city$.subscribe(console.log);
+    // this.cityByFn$.subscribe(console.log);
+    // this.multi$.subscribe((multi) => console.log({ multi }));
+    // this.state$.select().subscribe(console.log);
     this.state$.next(({
       ...this.state$.value,
       user: {
