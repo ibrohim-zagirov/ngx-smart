@@ -78,8 +78,9 @@ export class State<T extends object> extends BehaviorSubject<T> {
       )
   }
 
-  public clear() {
+  public reset() {
     this.next(this.initialState)
   }
+
 }
 

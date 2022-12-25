@@ -27,7 +27,7 @@ export class AppComponent {
 
   constructor() {
     this.state$.subscribe(console.log)
-    this.state$.clear()
+    this.state$.reset()
     // console.log(this.state$.value);
     // this.state$.subscribe((res) => console.log({ res }));
     // this.city$.subscribe(console.log);
